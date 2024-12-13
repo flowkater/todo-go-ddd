@@ -4,7 +4,6 @@ package wire
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/flowkater/ddd-todo-app/config"
 	"github.com/flowkater/ddd-todo-app/internal/application/command"
@@ -22,13 +21,6 @@ func provideEntOptions(cfg *config.Config) ([]ent.Option, error) {
 	drv, err := database.NewPostgresDriver(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create postgres driver: %v", err)
-	}
-
-	// Create client for migration
-	client := ent.NewClient(ent.Driver(drv))
-
-	if err := database.RunMigration(client); err != nil {
-		log.Printf("failed to run migration: %v", err)
 	}
 
 	return []ent.Option{ent.Driver(drv)}, nil
