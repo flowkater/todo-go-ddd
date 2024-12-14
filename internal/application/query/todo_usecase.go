@@ -2,8 +2,8 @@ package query
 
 import (
 	"context"
-	"time"
 
+	"github.com/flowkater/ddd-todo-app/internal/domain/entity"
 	"github.com/flowkater/ddd-todo-app/internal/domain/repository/query"
 	"github.com/flowkater/ddd-todo-app/pkg/errors"
 )
@@ -27,18 +27,11 @@ func (u *TodoQueryUsecase) Query(ctx context.Context, q interface{}) (interface{
 	}
 }
 
-func (u *TodoQueryUsecase) getTodoQuery(ctx context.Context, q GetTodoQuery) (*TodoDTO, error) {
+func (u *TodoQueryUsecase) getTodoQuery(ctx context.Context, q GetTodoQuery) (*entity.Todo, error) {
 	todo, err := u.todoRepo.GetById(ctx, q.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &TodoDTO{
-		ID:          todo.ID,
-		Title:       todo.Title,
-		Description: todo.Description,
-		Completed:   todo.Completed,
-		CreatedAt:   todo.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   todo.UpdatedAt.Format(time.RFC3339),
-	}, nil
+	return todo, nil
 }

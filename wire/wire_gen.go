@@ -18,7 +18,6 @@ import (
 	"github.com/flowkater/ddd-todo-app/internal/infrastructure/persistence/query"
 	"github.com/flowkater/ddd-todo-app/internal/interfaces/http"
 	"github.com/google/wire"
-	"log"
 )
 
 // Injectors from wire.go:
@@ -34,8 +33,8 @@ func InitializeServer(cfg *config.Config) (*http.Server, error) {
 	todoCommandUsecase := command2.NewTodoCommandUsecase(todoService, todoRepository)
 	queryTodoRepository := query.NewTodoRepository(client)
 	todoQueryUsecase := query2.NewTodoQueryUsecase(queryTodoRepository)
+	app := http.NewFiberApp(todoCommandUsecase, todoQueryUsecase)
 	todoHandler := http.NewTodoHandler(todoCommandUsecase, todoQueryUsecase)
-	app := http.NewFiberApp(todoHandler)
 	server := http.NewServer(app, cfg, todoHandler)
 	return server, nil
 }
@@ -46,12 +45,6 @@ func provideEntOptions(cfg *config.Config) ([]ent.Option, error) {
 	drv, err := database.NewPostgresDriver(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create postgres driver: %v", err)
-	}
-
-	client := ent.NewClient(ent.Driver(drv))
-
-	if err := database.RunMigration(client); err != nil {
-		log.Printf("failed to run migration: %v", err)
 	}
 
 	return []ent.Option{ent.Driver(drv)}, nil

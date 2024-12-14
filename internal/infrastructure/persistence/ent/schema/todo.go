@@ -9,17 +9,19 @@ import (
 )
 
 // Todo holds the schema definition for the Todo entity.
-type Routine struct {
+type Todo struct {
 	ent.Schema
 }
 
 // Fields of the Todo.
-func (Routine) Fields() []ent.Field {
+func (Todo) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title").
 			NotEmpty(),
 		field.Text("description").
 			Optional(),
+		field.Bool("completed").
+			Default(false),
 		field.Time("created_at").
 			Default(time.Now),
 		field.Time("updated_at").
@@ -29,11 +31,11 @@ func (Routine) Fields() []ent.Field {
 }
 
 // Edges of the Todo.
-func (Routine) Edges() []ent.Edge {
+func (Todo) Edges() []ent.Edge {
 	return nil
 }
 
-func (Routine) Indexes() []ent.Index {
+func (Todo) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("completed"),
 		index.Fields("created_at"),

@@ -1,83 +1,83 @@
 package http
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/flowkater/ddd-todo-app/internal/application/command"
 	"github.com/flowkater/ddd-todo-app/internal/application/query"
+	"github.com/flowkater/ddd-todo-app/internal/domain/entity"
+	"github.com/flowkater/ddd-todo-app/internal/interfaces/http/dto"
+	"github.com/flowkater/ddd-todo-app/internal/interfaces/http/errors"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 type TodoHandler struct {
 	commandUsecase *command.TodoCommandUsecase
 	queryUsecase   *query.TodoQueryUsecase
+	logger         *zap.Logger
 }
 
 func NewTodoHandler(commandUsecase *command.TodoCommandUsecase, queryUsecase *query.TodoQueryUsecase) *TodoHandler {
+	logger, _ := zap.NewProduction()
 	return &TodoHandler{
 		commandUsecase: commandUsecase,
 		queryUsecase:   queryUsecase,
+		logger:         logger,
 	}
-}
-
-type CreateTodoRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
 }
 
 func (h *TodoHandler) CreateTodo(c *fiber.Ctx) error {
-	var req CreateTodoRequest
+	var req dto.CreateTodoRequest
 	if err := c.BodyParser(&req); err != nil {
-		log.Printf("failed to parse request body: %v", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
+		return errors.NewHTTPError(fiber.StatusBadRequest, "Invalid request body", err)
 	}
 
-	log.Printf("received create todo request: %+v", req)
+	h.logger.Info("received create todo request",
+		zap.String("title", req.Title),
+		zap.String("description", req.Description),
+	)
+
+	todoCreation := req.ToEntity()
 	id, err := h.commandUsecase.Usecase(c.Context(), command.CreateTodoCommand{
-		Title:       req.Title,
-		Description: req.Description,
+		Title:       todoCreation.Title,
+		Description: todoCreation.Description,
 	})
 
 	if err != nil {
-		log.Printf("failed to create todo: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		return errors.NewHTTPError(fiber.StatusInternalServerError, "Failed to create todo", err)
 	}
 
-	log.Printf("todo created successfully with id: %d", id)
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Todo created successfully",
-		"id":     id,
-	})
+	h.logger.Info("todo created successfully",
+		zap.Int("id", id.(int)),
+	)
+
+	response := dto.CreateTodoResponse{
+		Message: "Todo created successfully",
+		ID:      id,
+	}
+	return c.Status(fiber.StatusCreated).JSON(response)
 }
 
 func (h *TodoHandler) GetTodo(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		log.Printf("failed to parse todo id: %v", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid todo ID",
-		})
+		return errors.NewHTTPError(fiber.StatusBadRequest, "Invalid todo ID", err)
 	}
 
-	log.Printf("getting todo with id: %d", id)
+	h.logger.Info("getting todo",
+		zap.Int("id", id),
+	)
+
 	result, err := h.queryUsecase.Query(c.Context(), query.GetTodoQuery{ID: id})
 	if err != nil {
-		if err.Error() == "ent: todo not found" {
-			log.Printf("todo not found with id: %d", id)
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"error": "Todo not found",
-			})
+		if errors.IsNotFound(err) {
+			return errors.NewHTTPError(fiber.StatusNotFound, "Todo not found", err)
 		}
-		log.Printf("failed to get todo: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		return errors.NewHTTPError(fiber.StatusInternalServerError, "Failed to get todo", err)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(result)
+	todo := result.(*entity.Todo)
+	response := dto.TodoResponseFromEntity(todo)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
