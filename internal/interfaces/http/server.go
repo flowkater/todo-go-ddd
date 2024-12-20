@@ -57,6 +57,7 @@ func NewFiberApp(commandUsecase *command.TodoCommandUsecase, queryUsecase *query
 	// 라우트 설정
 	app.Post("/todos", todoHandler.CreateTodo)
 	app.Get("/todos/:id", todoHandler.GetTodo)
+	app.Get("/todos/list", todoHandler.GetAllTodos)
 
 	return app
 }

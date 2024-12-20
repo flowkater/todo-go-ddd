@@ -81,3 +81,8 @@ func (h *TodoHandler) GetTodo(c *fiber.Ctx) error {
 	response := dto.TodoResponseFromEntity(todo)
 	return c.Status(fiber.StatusOK).JSON(response)
 }
+
+func (h *TodoHandler) GetAllTodos(c *fiber.Ctx) error {
+
+	return nil
+}
