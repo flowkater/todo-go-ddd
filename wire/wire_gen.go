@@ -47,6 +47,12 @@ func provideEntOptions(cfg *config.Config) ([]ent.Option, error) {
 		return nil, fmt.Errorf("failed to create postgres driver: %v", err)
 	}
 
+	client := ent.NewClient(ent.Driver(drv))
+
+	if err := database.RunMigration(client); err != nil {
+		return nil, fmt.Errorf("failed to run migration: %v", err)
+	}
+
 	return []ent.Option{ent.Driver(drv)}, nil
 }
 
