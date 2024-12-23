@@ -47,3 +47,11 @@ func TodoResponseFromEntity(todo *entity.Todo) *TodoResponse {
 		UpdatedAt:   todo.UpdatedAt.String(),
 	}
 }
+
+func TodosResponseFromEntity(todos []*entity.Todo) []*TodoResponse {
+	var responses []*TodoResponse
+	for _, todo := range todos {
+		responses = append(responses, TodoResponseFromEntity(todo))
+	}
+	return responses
+}
