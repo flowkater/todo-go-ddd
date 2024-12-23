@@ -34,6 +34,30 @@ func (r *todoRepository) GetById(ctx context.Context, id int) (*entity.Todo, err
 	}, nil
 }
 
+func (r *todoRepository) GetAll(ctx context.Context) ([]*entity.Todo, error) {
+	todos, err := r.client.Todo.
+		Query().
+		All(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*entity.Todo
+	for _, t := range todos {
+		result = append(result, &entity.Todo{
+			ID:          t.ID,
+			Title:       t.Title,
+			Description: t.Description,
+			Completed:   t.Completed,
+			CreatedAt:   t.CreatedAt,
+			UpdatedAt:   t.UpdatedAt,
+		})
+	}
+
+	return result, nil
+}
+
 // List implements query.TodoRepository.
 // func (r *todoRepository) List(ctx context.Context, filter query.TodoFilter) ([]*entity.Todo, error) {
 // 	panic("unimplemented")
