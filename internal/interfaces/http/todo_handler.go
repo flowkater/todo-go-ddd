@@ -83,6 +83,14 @@ func (h *TodoHandler) GetTodo(c *fiber.Ctx) error {
 }
 
 func (h *TodoHandler) GetAllTodos(c *fiber.Ctx) error {
+	h.logger.Info("getting all todos")
 
-	return nil
+	result, err := h.queryUsecase.Query(c.Context(), query.GetAllTodoQuery{})
+	if err != nil {
+		return errors.NewHTTPError(fiber.StatusInternalServerError, "Failed to get todos", err)
+	}
+
+	todos := result.([]*entity.Todo)
+	response := dto.TodosResponseFromEntity(todos)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
