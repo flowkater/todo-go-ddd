@@ -58,6 +58,7 @@ func NewFiberApp(commandUsecase *command.TodoCommandUsecase, queryUsecase *query
 	app.Post("/todos", todoHandler.CreateTodo)
 	app.Get("/todos/list", todoHandler.GetAllTodos)
 	app.Get("/todos/:id", todoHandler.GetTodo)
+	app.Delete("/todos/:id", todoHandler.DeleteTodo)
 
 	return app
 }

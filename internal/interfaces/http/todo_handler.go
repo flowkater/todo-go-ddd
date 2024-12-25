@@ -96,12 +96,15 @@ func (h *TodoHandler) GetAllTodos(c *fiber.Ctx) error {
 }
 
 func (h *TodoHandler) DeleteTodo(c *fiber.Ctx) error {
-	id, err := strconv.Atoi(c.Params("id"))
-
-	id = id
+	id, err := c.ParamsInt("id")
 	if err != nil {
-		return errors.NewHTTPError(fiber.StatusBadRequest, "Invalid todo ID", err)
+		return fiber.NewError(fiber.StatusBadRequest, "invalid todo id")
 	}
 
-	return nil
+	cmd := command.DeleteTodoCommand{ID: id}
+	if err := h.commandUsecase.DeleteTodo(c.Context(), cmd); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
 }
