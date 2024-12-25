@@ -37,6 +37,11 @@ type TodoResponse struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
+type UpdateTodoRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
 func TodoResponseFromEntity(todo *entity.Todo) *TodoResponse {
 	return &TodoResponse{
 		ID:          todo.ID,

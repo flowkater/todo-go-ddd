@@ -108,3 +108,32 @@ func (h *TodoHandler) DeleteTodo(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *TodoHandler) UpdateTodo(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid todo id")
+	}
+
+	var req dto.UpdateTodoRequest
+	if err := c.BodyParser(&req); err != nil {
+		return errors.NewHTTPError(fiber.StatusBadRequest, "Invalid request body", err)
+	}
+
+	h.logger.Info("received update todo request",
+		zap.Int("id", id),
+		zap.String("title", req.Title),
+		zap.String("description", req.Description),
+	)
+
+	cmd := command.UpdateTodoCommand{
+		ID:          id,
+		Title:       req.Title,
+		Description: req.Description,
+	}
+	if err := h.commandUsecase.UpdateTodo(c.Context(), cmd); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}

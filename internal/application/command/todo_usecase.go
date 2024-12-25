@@ -50,3 +50,17 @@ func (u *TodoCommandUsecase) DeleteTodo(ctx context.Context, cmd DeleteTodoComma
 	log.Printf("deleting todo with id: %d", cmd.ID)
 	return u.todoRepository.Delete(ctx, cmd.ID)
 }
+
+func (u *TodoCommandUsecase) UpdateTodo(ctx context.Context, cmd UpdateTodoCommand) error {
+	log.Printf("updating todo with id: %d", cmd.ID)
+
+	todo := &entity.Todo{
+		ID:          cmd.ID,
+		Title:       cmd.Title,
+		Description: cmd.Description,
+	}
+
+	updatedTodo := u.todoService.Edit(todo, cmd.Title, cmd.Description)
+
+	return u.todoRepository.Update(ctx, updatedTodo)
+}
