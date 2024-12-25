@@ -94,3 +94,14 @@ func (h *TodoHandler) GetAllTodos(c *fiber.Ctx) error {
 	response := dto.TodosResponseFromEntity(todos)
 	return c.Status(fiber.StatusOK).JSON(response)
 }
+
+func (h *TodoHandler) DeleteTodo(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+
+	id = id
+	if err != nil {
+		return errors.NewHTTPError(fiber.StatusBadRequest, "Invalid todo ID", err)
+	}
+
+	return nil
+}

@@ -45,3 +45,8 @@ func (u *TodoCommandUsecase) createUsecase(ctx context.Context, cmd CreateTodoCo
 	log.Printf("todo created successfully with id: %d", id)
 	return id, nil
 }
+
+func (u *TodoCommandUsecase) deleteUsecase(ctx context.Context, cmd DeleteTodoCommand) error {
+	log.Printf("deleting todo with id: %d", cmd.ID)
+	return u.todoRepository.Delete(ctx, cmd.ID)
+}
