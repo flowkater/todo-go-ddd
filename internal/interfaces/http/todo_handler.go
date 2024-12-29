@@ -137,3 +137,18 @@ func (h *TodoHandler) UpdateTodo(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *TodoHandler) ToggleTodo(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid todo id")
+	}
+
+	cmd := command.ToggleTodoCommand{ID: id}
+	if err := h.commandUsecase.ToggleTodo(c.Context(), cmd); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}

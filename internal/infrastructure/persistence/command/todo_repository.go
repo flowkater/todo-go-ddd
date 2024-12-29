@@ -48,3 +48,13 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 func (r *todoRepository) Delete(ctx context.Context, id int) error {
 	return r.client.Todo.DeleteOneID(id).Exec(ctx)
 }
+
+func (r *todoRepository) Toggle(ctx context.Context, id int) error {
+	todo, err := r.client.Todo.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return r.client.Todo.UpdateOneID(id).
+		SetCompleted(!todo.Completed).Exec(ctx)
+}

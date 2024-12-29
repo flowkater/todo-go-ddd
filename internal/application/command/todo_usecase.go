@@ -64,3 +64,8 @@ func (u *TodoCommandUsecase) UpdateTodo(ctx context.Context, cmd UpdateTodoComma
 
 	return u.todoRepository.Update(ctx, updatedTodo)
 }
+
+func (u *TodoCommandUsecase) ToggleTodo(ctx context.Context, cmd ToggleTodoCommand) error {
+	log.Printf("toggling todo with id: %d", cmd.ID)
+	return u.todoRepository.Toggle(ctx, cmd.ID)
+}
