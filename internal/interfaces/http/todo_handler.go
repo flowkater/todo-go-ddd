@@ -152,3 +152,13 @@ func (h *TodoHandler) ToggleTodo(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *TodoHandler) Summary(c *fiber.Ctx) error {
+	total, completed, uncompleted, err := h.queryUsecase.Summary(c.Context())
+	if err != nil {
+		return errors.NewHTTPError(fiber.StatusInternalServerError, "Failed to get todo summary", err)
+	}
+
+	response := dto.TodoSummaryResponseFromEntity(total, completed, uncompleted)
+	return c.Status(fiber.StatusOK).JSON(response)
+}

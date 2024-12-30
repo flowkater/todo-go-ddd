@@ -55,8 +55,17 @@ func NewFiberApp(commandUsecase *command.TodoCommandUsecase, queryUsecase *query
 	todoHandler := NewTodoHandler(commandUsecase, queryUsecase)
 
 	// 라우트 설정
-	app.Post("/todos", todoHandler.CreateTodo)
+	// app.Post("/todos", todoHandler.CreateTodo)
+	// app.Get("/todos/list", todoHandler.GetAllTodos)
+	// app.Get("/todos/:id", todoHandler.GetTodo)
+	// app.Delete("/todos/:id", todoHandler.DeleteTodo)
+	// app.Put("/todos/:id", todoHandler.UpdateTodo)
+	// app.Patch("/todos/:id/toggle", todoHandler.ToggleTodo)
+	// app.Get("/todos/summary", todoHandler.Summary)
+
+	app.Get("/todos/summary", todoHandler.Summary)
 	app.Get("/todos/list", todoHandler.GetAllTodos)
+	app.Post("/todos", todoHandler.CreateTodo)
 	app.Get("/todos/:id", todoHandler.GetTodo)
 	app.Delete("/todos/:id", todoHandler.DeleteTodo)
 	app.Put("/todos/:id", todoHandler.UpdateTodo)

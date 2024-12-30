@@ -66,3 +66,25 @@ func (r *todoRepository) GetAll(ctx context.Context) ([]*entity.Todo, error) {
 func NewTodoRepository(client *ent.Client) query.TodoRepository {
 	return &todoRepository{client: client}
 }
+
+func (r *todoRepository) Summary(ctx context.Context) (total int, completed int, uncompleted int, err error) {
+	// 전체 개수
+	total, err = r.client.Todo.
+		Query().
+		Count(ctx)
+
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	// 완료 개수
+	completed, err = r.client.Todo.Query().Where(todo.Completed(true)).Count(ctx)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	// 미완료 개수
+	uncompleted = total - completed
+
+	return total, completed, uncompleted, nil
+}

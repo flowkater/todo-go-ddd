@@ -46,3 +46,7 @@ func (u *TodoQueryUsecase) getAllTodoQuery(ctx context.Context, q GetAllTodoQuer
 
 	return todos, nil
 }
+
+func (u *TodoQueryUsecase) Summary(ctx context.Context) (total int, completed int, uncompleted int, err error) {
+	return u.todoRepo.Summary(ctx)
+}

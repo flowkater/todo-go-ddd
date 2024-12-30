@@ -10,6 +10,7 @@ type TodoRepository interface {
 	GetById(ctx context.Context, id int) (*entity.Todo, error)
 	GetAll(ctx context.Context) ([]*entity.Todo, error)
 	// List(ctx context.Context, filter TodoFilter) ([]*entity.Todo, error)
+	Summary(ctx context.Context) (total int, completed int, uncompleted int, err error)
 }
 
 type TodoFilter struct {
