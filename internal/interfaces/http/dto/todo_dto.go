@@ -37,6 +37,17 @@ type TodoResponse struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
+type UpdateTodoRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+type TodoSummaryResponse struct {
+	TotalCount  int `json:"totalCount"`
+	Completed   int `json:"completedCount"`
+	UnCompleted int `json:"unCompletedCount"`
+}
+
 func TodoResponseFromEntity(todo *entity.Todo) *TodoResponse {
 	return &TodoResponse{
 		ID:          todo.ID,
@@ -45,5 +56,21 @@ func TodoResponseFromEntity(todo *entity.Todo) *TodoResponse {
 		Completed:   todo.Completed,
 		CreatedAt:   todo.CreatedAt.String(),
 		UpdatedAt:   todo.UpdatedAt.String(),
+	}
+}
+
+func TodosResponseFromEntity(todos []*entity.Todo) []*TodoResponse {
+	var responses []*TodoResponse
+	for _, todo := range todos {
+		responses = append(responses, TodoResponseFromEntity(todo))
+	}
+	return responses
+}
+
+func TodoSummaryResponseFromEntity(totalCount, completedCount, unCompletedCount int) *TodoSummaryResponse {
+	return &TodoSummaryResponse{
+		TotalCount:  totalCount,
+		Completed:   completedCount,
+		UnCompleted: unCompletedCount,
 	}
 }

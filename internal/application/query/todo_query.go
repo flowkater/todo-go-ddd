@@ -4,6 +4,8 @@ type GetTodoQuery struct {
 	ID int
 }
 
+type GetAllTodoQuery struct{}
+
 type TodoDTO struct {
 	ID          int    `json:"id"`
 	Title       string `json:"title"`
